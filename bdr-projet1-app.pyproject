@@ -1,0 +1,14 @@
+{
+    "files": [
+        ".conf",
+        "client.py",
+        "login.py",
+        "login.ui",
+        "main.py",
+        "mainwindow.py",
+        "mainwindow.ui",
+        "stream.py",
+        "ui_login.py",
+        "ui_mainwindow.py"
+    ]
+}
