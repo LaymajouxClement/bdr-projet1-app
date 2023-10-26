@@ -49,11 +49,18 @@ class Client():
         try:
             with connexion.cursor() as cursor:
                 res = []
-                for r in cursor.execute(SQL_QUERY):
-                    res.append(r)
-
-                # connexion.close()
-                return res
+                rows = cursor.execute(SQL_QUERY)
+                if rows:
+                    for r in rows:
+                        res.append(r)
+            connexion.commit() # on valide le commit (dans le cas des INSERT/UPDATE/DELETE)
+            connexion.close()
+            return res
         except Exception as e:
             print(e)
             return []
+
+    def commit(self):
+        connexion:oracledb.Connection = self.create_connexion()
+        connexion.commit()
+        connexion.close()
