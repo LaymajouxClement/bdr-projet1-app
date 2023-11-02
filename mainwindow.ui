@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>486</height>
+    <width>1041</width>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,12 +22,12 @@
      <rect>
       <x>20</x>
       <y>0</y>
-      <width>601</width>
-      <height>421</height>
+      <width>1011</width>
+      <height>721</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tables_tab">
      <attribute name="title">
@@ -70,8 +70,8 @@
        <rect>
         <x>20</x>
         <y>100</y>
-        <width>551</width>
-        <height>271</height>
+        <width>971</width>
+        <height>531</height>
        </rect>
       </property>
      </widget>
@@ -85,8 +85,8 @@
        <rect>
         <x>10</x>
         <y>40</y>
-        <width>561</width>
-        <height>331</height>
+        <width>971</width>
+        <height>611</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -101,8 +101,8 @@
          <rect>
           <x>20</x>
           <y>10</y>
-          <width>521</width>
-          <height>281</height>
+          <width>931</width>
+          <height>551</height>
          </rect>
         </property>
        </widget>
@@ -149,8 +149,8 @@
        <rect>
         <x>10</x>
         <y>0</y>
-        <width>571</width>
-        <height>381</height>
+        <width>971</width>
+        <height>671</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -165,8 +165,8 @@
          <rect>
           <x>60</x>
           <y>20</y>
-          <width>461</width>
-          <height>238</height>
+          <width>831</width>
+          <height>411</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout">
@@ -269,13 +269,13 @@
        <attribute name="title">
         <string>Match</string>
        </attribute>
-       <widget class="QTableView" name="tableView">
+       <widget class="QTableView" name="match_admin_tv">
         <property name="geometry">
          <rect>
           <x>20</x>
-          <y>30</y>
-          <width>531</width>
-          <height>192</height>
+          <y>80</y>
+          <width>911</width>
+          <height>431</height>
          </rect>
         </property>
        </widget>
@@ -285,8 +285,8 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>390</x>
-          <y>270</y>
+          <x>590</x>
+          <y>570</y>
           <width>80</width>
           <height>24</height>
          </rect>
@@ -295,52 +295,104 @@
          <string>Modifier</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="nbreSpectateurs_le">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="geometry">
          <rect>
-          <x>240</x>
-          <y>270</y>
+          <x>440</x>
+          <y>570</y>
           <width>141</width>
           <height>24</height>
          </rect>
         </property>
         <property name="text">
-         <string>Nombre de Spectateurs</string>
+         <string/>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_2">
+       <widget class="QLineEdit" name="nbreButsA_le">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>270</y>
+          <x>220</x>
+          <y>570</y>
           <width>91</width>
           <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="nbreButsB_le">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>570</y>
+          <width>91</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>550</y>
+          <width>81</width>
+          <height>16</height>
          </rect>
         </property>
         <property name="text">
          <string>Nbr buts ClubA</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lineEdit_3">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
+       <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
-          <x>130</x>
-          <y>270</y>
+          <x>330</x>
+          <y>550</y>
           <width>91</width>
-          <height>24</height>
+          <height>16</height>
          </rect>
         </property>
         <property name="text">
          <string>Nbr buts ClubB</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>440</x>
+          <y>550</y>
+          <width>141</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Nombre de Spectateurs</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="refresh_match_btn">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>30</y>
+          <width>80</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Rafraîchir</string>
         </property>
        </widget>
       </widget>
@@ -410,7 +462,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>677</width>
+     <width>1041</width>
      <height>21</height>
     </rect>
    </property>

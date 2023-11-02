@@ -38,6 +38,17 @@ class MainWindow(QMainWindow):
         # on enleve les pages stats + admin si region de l'user != Region1
         self.tab_manager()
 
+        self.fill_match_admin_tv() # on met à jour la table d'administration des matchs
+        self.ui.match_admin_tv.clicked.connect(self.handle_match_admin_tv)
+
+        self.match_edit_btn = self.ui.match_edit_btn
+        self.match_edit_btn.clicked.connect(self.handle_match_edit_btn)
+
+        self.refresh_match_btn = self.ui.refresh_match_btn
+        self.refresh_match_btn.clicked.connect(self.handle_refresh_match_btn)
+
+        self.selected_match_admin = None
+
     def generate_table_view(self,sql):
         rows = self.client.query(sql)
         # Create a model for the QTableView
@@ -45,7 +56,8 @@ class MainWindow(QMainWindow):
 
         # Set the number of rows and columns in the model
         model.setRowCount(len(rows))
-        model.setColumnCount(len(rows[0]))  # Assuming all rows have the same number of columns
+        if len(rows)>0:
+            model.setColumnCount(len(rows[0]))  # Assuming all rows have the same number of columns
 
         # Populate the model with data
         for i, row in enumerate(rows):
@@ -80,13 +92,13 @@ class MainWindow(QMainWindow):
         choice = self.ui.table_cb.currentText()
         if choice != self.items[0]:
             sql = f"SELECT * FROM {choice}"
-            print(sql)
+            # print(sql)
             model = self.generate_table_view(sql)
             # Set the model for the QTableView
             self.ui.table_tv.setModel(model)
 
     def handle_stat_generator_btn(self):
-        self.stat_generator_btn.setEnabled(False)
+        # self.stat_generator_btn.setEnabled(False)
         # fill stade stats
         self.stat_stade_generator()
         self.stat_equipe_generator()
@@ -187,6 +199,17 @@ class MainWindow(QMainWindow):
             self.items.append(str(row[0])) # on ajoute le nom de la table
         self.ui.arbitre_cb.addItems(self.items)
 
+    def get_region_of_stade(self,nomstade_str):
+        sql = f"""
+            SELECT region
+            FROM Site1.allstadesite1 s
+            JOIN matchsite1 m
+            ON m.codestade=s.code
+            WHERE s.nom='{nomstade_str}'
+        """
+        print(sql)
+        return self.client.query(sql)[0][0]
+
     def handle_create_calendrier_btn(self):
         stade = self.ui.stade_cb.currentText()
         equipeA = self.ui.equipeA_cb.currentText()
@@ -208,9 +231,10 @@ class MainWindow(QMainWindow):
             0,
             {arbitre},
             (SELECT Code FROM AllStadeSite1 WHERE Nom='{stade}')
-        )"""
-        print(sql)
+        )"""      
+        # print(sql)
         self.client.query(sql)
+
         sql = f"""
         INSERT INTO
             CalendrierSite1(CodeMatch, DateMatch, Heure, ClubA, ClubB, Stade)
@@ -224,7 +248,7 @@ class MainWindow(QMainWindow):
         )"""
 
         self.client.query(sql)
-        print(sql)
+        # print(sql)
 
         self.client.commit() # on valide le commit
 
@@ -239,3 +263,96 @@ class MainWindow(QMainWindow):
         self.ui.calendrier_date_de.setEnabled(False)
         self.ui.create_calendrier_btn.setEnabled(False)
 
+        self.fill_match_admin_tv() # on met à jour la table d'administration des matchs
+
+    def handle_refresh_match_btn(self):
+        if self.client.user != "Site1":
+            sql = f"""
+            DROP MATERIALIZED VIEW Match{self.client.user}
+            """
+            self.client.query(sql)
+
+            sql = f"""
+            CREATE MATERIALIZED VIEW Match{self.client.user}
+            REFRESH ON DEMAND
+            AS
+            SELECT m.CodeMatch, m.NbreButsClubA, m.NbreButsClubB, m.NbreSpectateurs, m.CodeArbitre, m.CodeStade
+            FROM Site1.MatchSite1 m, Site1.AllStadeSite1 s
+            WHERE m.CodeStade=s.Code AND s.region={self.client.user[-1]}
+            """
+            self.client.query(sql)
+        self.fill_match_admin_tv()
+
+    def fill_match_admin_tv(self):
+        sql = f"""SELECT * FROM match{self.client.user}
+        """
+        model = self.generate_table_view(sql)
+        self.ui.match_admin_tv.setModel(model)
+
+    def handle_match_admin_tv(self,index):
+        row = index.row()
+        model = self.ui.match_admin_tv.model()
+
+        # Ensure the model is a QStandardItemModel
+        if isinstance(model, QStandardItemModel):
+            num_columns = model.columnCount()
+
+            row_data = []
+            for column in range(num_columns):
+                item = model.item(row, column)
+                if item:
+                    cell_data = item.text()
+                    row_data.append(cell_data)
+            self.selected_match_admin = row_data
+            self.ui.nbreButsA_le.setEnabled(True)
+            self.ui.nbreButsA_le.setText(row_data[1])
+            self.ui.nbreButsB_le.setEnabled(True)
+            self.ui.nbreButsB_le.setText(row_data[2])
+            self.ui.nbreSpectateurs_le.setEnabled(True)
+            self.ui.nbreSpectateurs_le.setText(row_data[3])
+            self.ui.match_edit_btn.setEnabled(True)
+
+    def handle_match_edit_btn(self):
+        # TODO UPDATE the match
+        codeMatch = self.selected_match_admin[0]
+        try:
+            nbrButsA = int(self.ui.nbreButsA_le.text())
+            nbrButsB = int(self.ui.nbreButsB_le.text())
+            nbrSpecs = int(self.ui.nbreSpectateurs_le.text())
+        except:
+            return
+        if self.client.user != "Site1":
+            sql = f"""
+            UPDATE
+                SITE1.matchsite1
+            SET
+                NbreButsClubA = {nbrButsA},
+                NbreButsClubB = {nbrButsB},
+                NbreSpectateurs = {nbrSpecs}
+            WHERE
+                CodeMatch={codeMatch}
+            """
+            self.client.query(sql)
+
+            sql = f"""
+            DROP MATERIALIZED VIEW Match{self.client.user}
+            """
+            self.client.query(sql)
+
+            sql = f"""
+            CREATE MATERIALIZED VIEW Match{self.client.user}
+            REFRESH ON DEMAND
+            AS
+            SELECT m.CodeMatch, m.NbreButsClubA, m.NbreButsClubB, m.NbreSpectateurs, m.CodeArbitre, m.CodeStade
+            FROM MatchSite1 m, AllStadeSite1 s
+            WHERE m.CodeStade=s.Code AND s.region={self.client.user[-1]}
+            """
+            self.client.query(sql)
+
+
+        self.ui.nbreButsA_le.setEnabled(False)
+        self.ui.nbreButsB_le.setEnabled(False)
+        self.ui.nbreSpectateurs_le.setEnabled(False)
+        self.ui.match_edit_btn.setEnabled(False)
+
+        self.fill_match_admin_tv() # on met à jour la table d'administration des matchs
